@@ -1,9 +1,9 @@
 # 🖥️ Parallel Web Clickstream Processing Pipeline
 
-> **CS-2006: Operating Systems — Final Term Project**
+> **CS-2006: Operating Systems - Final Term Project**
 > FAST-NUCES, Islamabad Campus · May 2026
 
-A fully parallel, **multi-process, multi-threaded** data pipeline on Linux that ingests web clickstream CSV files, aggregates per-user session metrics across a thread pool, and writes formatted reports — all while demonstrating every major OS concept covered in the course.
+A fully parallel, **multi-process, multi-threaded** data pipeline on Linux that ingests web clickstream CSV files, aggregates per-user session metrics across a thread pool, and writes formatted reports - all while demonstrating every major OS concept covered in the course.
 
 ---
 
@@ -39,14 +39,14 @@ Modern web applications produce enormous volumes of clickstream data. Single-thr
 
 | Stage | Executable | Role |
 |-------|-----------|------|
-| **Orchestrate** | `dispatcher` | Master process — forks children, manages IPC, reaps exits |
+| **Orchestrate** | `dispatcher` | Master process - forks children, manages IPC, reaps exits |
 | **Ingest** | `ingester` | Scans input directory, streams CSV chunks through a named FIFO |
 | **Process** | `processor` | Thread pool reads FIFO, parses rows, aggregates into shared memory |
 | **Report** | `reporter` | Reads shared memory, writes `report.txt` and `report.csv` |
 
 Two metrics are computed **per user**:
-- **Average Session Length** — total session time ÷ visit count
-- **Bounce Rate (%)** — percentage of single-interaction sessions
+- **Average Session Length** - total session time ÷ visit count
+- **Bounce Rate (%)** - percentage of single-interaction sessions
 
 ---
 
@@ -103,10 +103,10 @@ Two metrics are computed **per user**:
 
 ```
 Operating-Systems-Project/
-├── dispatcher.c       # Master process — IPC setup, fork+exec, cleanup
-├── ingester.c         # CSV reader — FIFO writer
-├── processor.c        # Thread pool — FIFO reader, aggregator, SHM writer
-├── reporter.c         # Report writer — SHM reader, dup/dup2 demo
+├── dispatcher.c       # Master process - IPC setup, fork+exec, cleanup
+├── ingester.c         # CSV reader - FIFO writer
+├── processor.c        # Thread pool - FIFO reader, aggregator, SHM writer
+├── reporter.c         # Report writer - SHM reader, dup/dup2 demo
 ├── common.h           # Shared structs: ChunkHeader, UserData, SharedData
 ├── Makefile           # Builds all four executables with -Wall -Wextra -pthread
 ├── run.sh             # Bash orchestrator with getopts, trap, and summary
@@ -135,8 +135,8 @@ user_003,567,23,0
 user_001,201,7,0
 ```
 
-- **First column** — string user identifier
-- **Remaining columns** — integers (page durations / engagement metrics)
+- **First column** - string user identifier
+- **Remaining columns** - integers (page durations / engagement metrics)
 - A row with **only one numeric column** counts as a **bounce**
 - Multiple CSV files in the input directory are all processed
 
@@ -181,8 +181,8 @@ chmod +x run.sh
 | `-i` | Input directory containing `.csv` files | *(required)* |
 | `-o` | Output directory for reports | `output/` |
 | `-n` | Number of worker threads in processor | `4` |
-| `-c` | Clean build artifacts | — |
-| `-h` | Show help | — |
+| `-c` | Clean build artifacts | - |
+| `-h` | Show help | - |
 
 **Examples:**
 
@@ -217,7 +217,7 @@ cat logs/reporter.log
 
 After a successful run you'll find two files in your output directory:
 
-### `report.txt` — human-readable table
+### `report.txt` - human-readable table
 
 ```
 ========================================
@@ -237,7 +237,7 @@ Report generated successfully!
 
 > `report.txt` is written using the `dup`/`dup2` stdout-redirect technique: stdout is saved with `dup(1)`, redirected to the file with `dup2(report_fd, 1)`, and restored afterward.
 
-### `report.csv` — machine-readable
+### `report.csv` - machine-readable
 
 ```csv
 user_id,avg_session,total_visits,bounce_rate
@@ -268,13 +268,13 @@ Users Processed: 10
 
 | Resource | Created By | Destroyed By |
 |----------|-----------|-------------|
-| `/tmp/my_fifo` | dispatcher — `mkfifo()` | dispatcher — `unlink()` after all `waitpid()`s |
-| `/my_shm` | dispatcher — `shm_open()` + `ftruncate()` | dispatcher — `munmap()` + `shm_unlink()` |
-| `/my_sem` | dispatcher — `sem_open(O_CREAT, 0)` | dispatcher — `sem_close()` + `sem_unlink()` |
-| Thread pool (N+1 threads) | processor — `pthread_create()` | processor — `pthread_join()` |
-| `sem_empty` / `sem_full` | processor — `sem_init()` | processor — `sem_destroy()` |
-| `queue_mutex`, `agg_mutex` | processor — static initializers | processor — `pthread_mutex_destroy()` |
-| `logs/*.log` | dispatcher — `open()` before `execvp()` | kept on disk for inspection |
+| `/tmp/my_fifo` | dispatcher - `mkfifo()` | dispatcher - `unlink()` after all `waitpid()`s |
+| `/my_shm` | dispatcher - `shm_open()` + `ftruncate()` | dispatcher - `munmap()` + `shm_unlink()` |
+| `/my_sem` | dispatcher - `sem_open(O_CREAT, 0)` | dispatcher - `sem_close()` + `sem_unlink()` |
+| Thread pool (N+1 threads) | processor - `pthread_create()` | processor - `pthread_join()` |
+| `sem_empty` / `sem_full` | processor - `sem_init()` | processor - `sem_destroy()` |
+| `queue_mutex`, `agg_mutex` | processor - static initializers | processor - `pthread_mutex_destroy()` |
+| `logs/*.log` | dispatcher - `open()` before `execvp()` | kept on disk for inspection |
 
 After a clean run:
 ```bash
@@ -313,15 +313,15 @@ ls /tmp/my_fifo  # should show "No such file or directory"
 ## 👤 Work Division
 
 **Abdul Rauf (24I-0060)**
-- `processor.c` — full thread pool: `pthread_attr_t` setup, reader thread (FIFO → queue), N worker threads (CSV parsing, session/bounce calculation, `agg_mutex`-protected aggregation), `sem_empty`/`sem_full` bounded-buffer, poison-pill shutdown, `pthread_join` loop, shared-memory write + `sem_post()`
-- `ingester.c` — `opendir`/`readdir` scanner, `fgets` read loop, binary `ChunkHeader` framing, FIFO writes, EOF sentinel, `SIGTERM`/`SIGUSR1` handlers
-- `common.h` — all shared structs (`ChunkHeader`, `UserData`, `SharedData`) and exit-code constants
-- `run.sh` — full Bash orchestrator: `getopts`, four functions, `trap`-based cleanup, arithmetic expansion for runtime, `-c` clean option
+- `processor.c` - full thread pool: `pthread_attr_t` setup, reader thread (FIFO → queue), N worker threads (CSV parsing, session/bounce calculation, `agg_mutex`-protected aggregation), `sem_empty`/`sem_full` bounded-buffer, poison-pill shutdown, `pthread_join` loop, shared-memory write + `sem_post()`
+- `ingester.c` - `opendir`/`readdir` scanner, `fgets` read loop, binary `ChunkHeader` framing, FIFO writes, EOF sentinel, `SIGTERM`/`SIGUSR1` handlers
+- `common.h` - all shared structs (`ChunkHeader`, `UserData`, `SharedData`) and exit-code constants
+- `run.sh` - full Bash orchestrator: `getopts`, four functions, `trap`-based cleanup, arithmetic expansion for runtime, `-c` clean option
 
 **Abdul Azeem (24I-2013)**
-- `reporter.c` — SHM open + `mmap`, `sem_wait` blocking, per-user metric calculation, `dup`/`dup2` stdout-redirect block for `report.txt`, `fopen`-based `report.csv`, `SIGUSR1` to dispatcher via `getppid()`
-- `dispatcher.c` — argument parsing, IPC creation (`mkfifo`, `shm_open`, `sem_open`), three `fork()`+`dup2()`+`execvp()` sequences, all four signal handlers, `waitpid()` loop, full IPC cleanup
-- Testing & debugging — multi-CSV and multi-thread validation, log verification, `ipcs -m` leak checks, race condition diagnosis and fix in the aggregation table
+- `reporter.c` - SHM open + `mmap`, `sem_wait` blocking, per-user metric calculation, `dup`/`dup2` stdout-redirect block for `report.txt`, `fopen`-based `report.csv`, `SIGUSR1` to dispatcher via `getppid()`
+- `dispatcher.c` - argument parsing, IPC creation (`mkfifo`, `shm_open`, `sem_open`), three `fork()`+`dup2()`+`execvp()` sequences, all four signal handlers, `waitpid()` loop, full IPC cleanup
+- Testing & debugging - multi-CSV and multi-thread validation, log verification, `ipcs -m` leak checks, race condition diagnosis and fix in the aggregation table
 
 ---
 
