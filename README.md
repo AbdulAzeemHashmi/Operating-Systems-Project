@@ -3,7 +3,7 @@
 > **CS-2006: Operating Systems - Final Term Project**
 > FAST-NUCES, Islamabad Campus · May 2026
 
-A fully parallel, **multi-process, multi-threaded** data pipeline on Linux that ingests web clickstream CSV files, aggregates per-user session metrics across a thread pool, and writes formatted reports - all while demonstrating every major OS concept covered in the course.
+A fully parallel, **multi-process, multi-threaded** data pipeline on Linux that ingests web clickstream CSV files, aggregates per-user session metrics across a thread pool, and writes formatted reports - all while demonstrating every major OS concept covered in the course.   
 
 ---
 
