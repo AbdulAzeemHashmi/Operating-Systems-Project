@@ -57,8 +57,8 @@ Two metrics are computed **per user**:
                             │  launches
                             ▼
               ┌─────────────────────────────┐
-              │         dispatcher.c         │◄─── SIGUSR1 (done)
-              │  fork+exec │ waitpid │ IPC   │
+              │         dispatcher.c        │◄─── SIGUSR1 (done)
+              │  fork+exec │ waitpid │ IPC  │
               └────────────┬────────────────┘
                  fork+exec │
          ┌─────────────────┼─────────────────┐
