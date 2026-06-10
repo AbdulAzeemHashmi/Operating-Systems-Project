@@ -69,7 +69,6 @@ Two metrics are computed **per user**:
    │→ FIFO    │     │+ N workers │     │ dup/dup2     │
    └──────────┘     │→ shm write │sem  │ writes files │
                     └────────────┘     └──────────────┘
-                         │dup2()
                     logs/ingester.log
                     logs/processor.log
                     logs/reporter.log
