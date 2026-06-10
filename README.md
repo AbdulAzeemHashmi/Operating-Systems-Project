@@ -68,7 +68,7 @@ Two metrics are computed **per user**:
    │reads CSV │FIFO │reader thd + N workers │SHM  │ sem_wait     │
    │→ FIFO    │     │→ shm write            │sem  │ dup/dup2     │
    └──────────┘     └───────────────────────┘     │ writes files │
-                        └──────────────┘
+                                                  └──────────────┘
 ```
 
 **Data flow:** `CSV files → FIFO → thread pool → shared memory → report files`
