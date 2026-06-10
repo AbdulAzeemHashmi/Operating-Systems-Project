@@ -69,7 +69,6 @@ Two metrics are computed **per user**:
    │→ FIFO    │     │+ N workers │     │ dup/dup2     │
    └──────────┘     │→ shm write │sem  │ writes files │
                     └────────────┘     └──────────────┘
-                    logs/reporter.log
 ```
 
 **Data flow:** `CSV files → FIFO → thread pool → shared memory → report files`
